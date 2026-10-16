@@ -22,7 +22,7 @@ def load_geojson():
 
 @st.cache_data(ttl=3600)
 def api_get(path, **params):
-    r = requests.get(f"{API_URL}{path}", params=params, timeout=30)
+    r = requests.get(f"{API_URL}{path}", params=params, timeout=90)
     r.raise_for_status()
     return r.json()
 
