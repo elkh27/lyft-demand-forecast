@@ -6,6 +6,10 @@ from typing import Annotated
 import lightgbm as lgb
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+import lightgbm as lgb
+import pandas as pd
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import RedirectResponse
 
 ROOT = Path(__file__).resolve().parent.parent
 FEATURES = ["zone_id", "hour_of_day", "dow", "hour_of_week", "month",
@@ -84,7 +88,9 @@ def predict(rows: pd.DataFrame) -> pd.DataFrame:
     out["actual"] = out["actual"].astype(int)
     return out
 
-
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse("/docs")
 @app.get("/health", summary="Check that the API is running")
 def health():
     return {"status": "ok", "data_range": [str(TS_MIN), str(TS_MAX)]}
