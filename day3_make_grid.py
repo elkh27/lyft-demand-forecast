@@ -2,7 +2,7 @@ import duckdb
 
 con = duckdb.connect()
 
-# ۱. ترکیب فایل‌های ماهانه
+# 1. Combine monthly files
 con.sql("""
     CREATE TABLE counts AS
     SELECT hour, zone_id, SUM(n_requests) AS n_requests
@@ -11,7 +11,7 @@ con.sql("""
     GROUP BY ALL
 """)
 
-# ۲. همه‌ی ترکیب‌های ساعت و منطقه
+# 2. Every hour x zone combination
 con.sql("""
     CREATE TABLE grid AS
     SELECT h.hour, z.LocationID AS zone_id
@@ -27,7 +27,7 @@ con.sql("""
     ) AS z
 """)
 
-# ۳. وصل کردن تعدادها و پر کردن خالی‌ها با صفر
+# 3. Join counts and fill gaps with zero
 con.sql("""
     COPY (
         SELECT g.hour, g.zone_id,

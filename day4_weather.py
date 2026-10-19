@@ -14,7 +14,7 @@ with urllib.request.urlopen(url) as r:
 
 w = pd.DataFrame(data["hourly"])
 
-# تبدیل از UTC به ساعت محلی نیویورک، مثل داده‌ی سفرها
+# Convert UTC to New York local time to match the trip data
 w["ts"] = (pd.to_datetime(w["time"])
              .dt.tz_localize("UTC")
              .dt.tz_convert("America/New_York")

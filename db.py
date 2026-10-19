@@ -10,7 +10,7 @@ def get_con():
         CREATE VIEW zones AS
         SELECT * FROM read_csv_auto('data/taxi_zone_lookup.csv')
     """)
-    # فقط لیفت، و فقط درخواست‌های داخل بازه‌ی سه ماه
+    # Lyft only, and only requests inside the three-month window
     con.sql("""
         CREATE VIEW lyft AS
         SELECT * FROM trips

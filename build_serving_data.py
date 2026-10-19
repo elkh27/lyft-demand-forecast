@@ -18,7 +18,7 @@ zones = (pd.read_csv("data/taxi_zone_lookup.csv")
 zones = zones[zones["zone_id"].isin(df["zone_id"].unique())][["zone_id", "borough", "zone"]]
 zones.to_csv("serving/zones.csv", index=False)
 
-# بررسی: مدل ذخیره‌شده روی همین داده باید همون WAPE روز ۴ رو بده
+# Sanity check: the saved model must reproduce the test WAPE from training
 booster = lgb.Booster(model_file="models/lgbm_demand.txt")
 X = df[FEATURES].copy()
 X["zone_id"] = X["zone_id"].astype("category")

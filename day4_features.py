@@ -27,10 +27,10 @@ df = con.sql("""
     ORDER BY zone_id, ts
 """).df()
 
-# میانگین همین ساعت در ۴ هفته‌ی گذشته
+# Mean of the same hour over the previous 4 weeks
 df["same_hour_mean_4w"] = df[["lag_168", "lag_336", "lag_504", "lag_672"]].mean(axis=1)
 
-# تعطیلات و روزهای خاص
+# Holidays and special days
 us_holidays = pd.to_datetime(list(holidays.US(years=[2024, 2025]).keys()))
 hol = holidays.US(years=[2024, 2025])
 thanksgiving = [pd.Timestamp(d) for d, name in hol.items() if "Thanksgiving" in name]
@@ -50,7 +50,7 @@ df["holiday_season"] = (((m == 12) & (d >= 20)) | ((m == 1) & (d <= 2))).astype(
 off_days = us_holidays.union(special)
 df["lag_168_offday"] = (day - pd.Timedelta(days=7)).isin(off_days).astype(int)
 
-# آب‌وهوا
+# Weather
 weather = pd.read_parquet("data/weather.parquet")
 df = df.merge(weather, on="ts", how="left")
 

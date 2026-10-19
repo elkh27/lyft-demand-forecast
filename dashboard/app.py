@@ -27,14 +27,14 @@ def api_get(path, **params):
     return r.json()
 
 
-# اگه رابط در دسترس نیست، پیام واضح بده
+# Show a clear message if the API is unreachable
 try:
     api_get("/health")
 except requests.RequestException:
     st.error(f"Cannot reach the forecast API at {API_URL}. Start it first.")
     st.stop()
 
-# ---------- نوار کناری ----------
+# ---------- Sidebar ----------
 st.sidebar.header("Choose a time")
 day = st.sidebar.date_input("Date", value=date(2025, 11, 14),
                             min_value=date(2025, 10, 1), max_value=date(2025, 12, 31))
@@ -47,7 +47,7 @@ st.caption(f"{ts:%A, %B %d, %Y · %H:00}")
 
 tab_map, tab_zone, tab_about = st.tabs(["City map", "Zone detail", "About the model"])
 
-# ---------- تب ۱: نقشه ----------
+# ---------- Tab 1: city map ----------
 with tab_map:
     city = api_get("/predict/city", ts=ts.isoformat())
     df = pd.DataFrame(city["zones"])
@@ -84,7 +84,7 @@ with tab_map:
     st.dataframe(df.nlargest(10, "predicted")[["zone", "borough", "predicted", "actual"]],
                  hide_index=True, use_container_width=True)
 
-# ---------- تب ۲: یک منطقه ----------
+# ---------- Tab 2: zone detail ----------
 with tab_zone:
     zones = pd.DataFrame(api_get("/zones"))
     zones["label"] = (zones["zone_id"].astype(str) + " – " + zones["zone"]
@@ -110,7 +110,7 @@ with tab_zone:
     fig2.update_layout(height=420, xaxis=dict(dtick=1))
     st.plotly_chart(fig2, use_container_width=True)
 
-# ---------- تب ۳: درباره ----------
+# ---------- Tab 3: about ----------
 with tab_about:
     st.markdown("""
 **What this shows.** Day-ahead hourly forecasts of Lyft ride requests for 262 NYC taxi zones,

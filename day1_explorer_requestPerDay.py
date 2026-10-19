@@ -2,7 +2,7 @@ import duckdb
 
 con = duckdb.connect()
 
-# یک view روی هر سه فایل پارکت؛ داده در حافظه بارگذاری نمی‌شه
+# A view over all Parquet files; data is not loaded into memory
 con.sql("""
     CREATE VIEW trips AS
     SELECT * FROM read_parquet('data/fhvhv_tripdata_*.parquet')
@@ -12,13 +12,13 @@ con.sql("""
     SELECT * FROM read_csv_auto('data/taxi_zone_lookup.csv')
 """)
 
-# ۱. ستون‌ها و نوع داده‌شون
+# 1. Columns and their types
 print(con.sql("DESCRIBE trips"))
 
-# ۲. تعداد کل سفرها
+# 2. Total number of trips
 print(con.sql("SELECT COUNT(*) AS n_trips FROM trips"))
 
-# ۳. سهم هر شرکت
+# 3. Share of each company
 print(con.sql("""
     SELECT
         EXTRACT(hour FROM request_datetime) AS hour,
@@ -43,7 +43,7 @@ print(con.sql("""
 """).df().to_string())
 
 
-# ۶. میانگین درخواست‌های لیفت در هر روز هفته
+# 6. Average Lyft requests per weekday
 print(con.sql("""
     SELECT
         isodow(request_datetime) AS dow,

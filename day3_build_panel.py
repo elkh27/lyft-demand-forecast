@@ -17,7 +17,7 @@ for month in months:
         continue
 
     raw = DATA_DIR / f"fhvhv_tripdata_{month}.parquet"
-    keep_raw = raw.exists()   # فایل‌های سه ماه قبلی رو پاک نکن
+    keep_raw = raw.exists()   # keep the files downloaded earlier
     if not raw.exists():
         print(f"{month}: downloading ...")
         urllib.request.urlretrieve(f"{BASE}/fhvhv_tripdata_{month}.parquet", raw)

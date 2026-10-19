@@ -4,7 +4,7 @@ import pandas as pd
 import lightgbm as lgb
 
 df = pd.read_parquet("data/features.parquet")
-df = df.dropna(subset=["lag_336", "roll_mean_168"])   # دو هفته‌ی اول تاریخچه نداره
+df = df.dropna(subset=["lag_336", "roll_mean_168"])   # the first two weeks have no lag history
 df["zone_id"] = df["zone_id"].astype("category")
 
 FEATURES = ["zone_id", "hour_of_day", "dow", "hour_of_week", "month",
@@ -26,11 +26,11 @@ def report(name, y, pred):
 
 y_test = test[TARGET].values
 
-# مدل‌های مبنا
+# Baselines
 report("baseline: yesterday", y_test, test["lag_24"].values)
 report("baseline: last week", y_test, test["lag_168"].values)
 
-# مدل اصلی
+# Main model
 model = lgb.LGBMRegressor(
     objective="poisson",
     n_estimators=2000,
@@ -47,11 +47,11 @@ model.fit(
 pred = model.predict(test[FEATURES])
 report("LightGBM", y_test, pred)
 
-# اهمیت ویژگی‌ها
+# Feature importance
 imp = pd.Series(model.booster_.feature_importance("gain"), index=FEATURES)
 print((imp / imp.sum() * 100).sort_values(ascending=False).round(1))
 
-# ذخیره برای روز ۵
+# Save the model for serving
 Path("models").mkdir(exist_ok=True)
 model.booster_.save_model("models/lgbm_demand.txt")
 
@@ -60,12 +60,12 @@ import matplotlib.pyplot as plt
 
 test = test.assign(pred=pred, abs_err=np.abs(test[TARGET] - pred))
 
-# خطا در هر روز
+# Error by day
 daily = test.groupby(test["ts"].dt.date).agg(err=("abs_err", "sum"), y=(TARGET, "sum"))
 daily["wape"] = daily["err"] / daily["y"] * 100
 print(daily["wape"].sort_values(ascending=False).head(8).round(1))
 
-# پیش‌بینی در مقابل واقعیت برای میدتاون، هفته‌ی شکرگزاری
+# Predicted vs actual for Midtown, Thanksgiving week
 zone = test[(test["zone_id"] == 161) &
             (test["ts"] >= "2025-11-23") & (test["ts"] < "2025-11-30")]
 plt.figure(figsize=(12, 4))
